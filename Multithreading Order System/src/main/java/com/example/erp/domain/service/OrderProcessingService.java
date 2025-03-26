@@ -24,7 +24,7 @@ public class OrderProcessingService {
    private final KafkaTemplate<String, UnprocessedOrder> kafkaTemplate;
 
     @Autowired
-    public OrderProcessingService(OrderRepository orderRepository, RestTemplate restTemplate, KafkaTemplate<String, UnprocessedOrder> kafkaTemplate) {
+    public OrderProcessingService(OrderRepository orderRepository /*,RestTemplate restTemplate*/, KafkaTemplate<String, UnprocessedOrder> kafkaTemplate) {
         this.orderRepository = orderRepository;
         this.kafkaTemplate = kafkaTemplate;
         //this.restTemplate = restTemplate;
