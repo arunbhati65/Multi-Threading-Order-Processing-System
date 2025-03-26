@@ -47,21 +47,37 @@ This project consists of two microservices that communicate using Apache Kafka:
 - PostgreSQL/MongoDB
 - Maven
 
-### Steps to Run
-1. **Start Kafka**
+### Installing and Running Kafka
+1. **Download and Extract Kafka**
    ```sh
-   kafka-server-start.sh config/server.properties
+   wget https://downloads.apache.org/kafka/4.0.0/kafka_2.13-4.0.0.tgz
+   tar -xzf kafka_2.13-4.0.0.tgz
+   cd kafka_2.13-4.0.0
    ```
-2. **Create Kafka Topics**
+2. **Start Zookeeper** (Kafka requires Zookeeper to run)
    ```sh
-   kafka-topics.sh --create --topic order-events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
-   kafka-topics.sh --create --topic archived-orders --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+   bin/zookeeper-server-start.sh config/zookeeper.properties &
    ```
-3. **Run Order Processing Service**
+3. **Start Kafka Broker**
+   ```sh
+   bin/kafka-server-start.sh config/server.properties &
+   ```
+4. **Verify Kafka is Running**
+   ```sh
+   bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+   ```
+
+### Steps to Run Microservices
+1. **Create Kafka Topics**
+   ```sh
+   bin/kafka-topics.sh --create --topic order-events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+   bin/kafka-topics.sh --create --topic archived-orders --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+   ```
+2. **Run Order Processing Service**
    ```sh
    mvn spring-boot:run
    ```
-4. **Run Archiver Service**
+3. **Run Archiver Service**
    ```sh
    mvn spring-boot:run
    ```
