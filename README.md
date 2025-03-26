@@ -16,28 +16,32 @@ This project consists of two microservices that communicate using Apache Kafka:
 
 ### 1. Order Processing Service
 - Exposes REST API to receive orders
-- Publishes orders to a Kafka topic (`order-events`)
+- Publishes orders to a Kafka topic (`processed-orders`)
 - Listens for processing confirmation and updates order status
 
 #### Endpoints
-| Method | Endpoint         | Description              |
-|--------|----------------|--------------------------|
-| POST   | /orders/add    | Add a new order         |
-| GET    | /orders/all    | Get all pending orders  |
-| GET    | /orders/hardcoded | Add sample orders |
+| Method | Endpoint               | Description                         |
+|--------|------------------------|-------------------------------------|
+| POST   | /orders/receive        | Add a new order                    |
+| GET    | /orders/all-unprocessed | Get all unprocessed orders         |
+| GET    | /orders/addHardcoded    | Add sample orders                  |
 
 #### Kafka Configuration
-- **Producer Topic:** `order-events`
-- **Consumer Topic:** `archived-orders`
+- **Producer Topic:** `processed-orders`
 
 ### 2. Archiver Service
 - Listens for processed orders
 - Archives them in a database
-- Sends a confirmation message back to Kafka
+- Exposes REST API to retrieve archived orders
+
+#### Endpoints
+| Method | Endpoint               | Description                        |
+|--------|------------------------|------------------------------------|
+| POST   | /archived-orders       | Archive an order                  |
+| GET    | /archived-orders/all   | Get all archived orders           |
 
 #### Kafka Configuration
-- **Consumer Topic:** `order-events`
-- **Producer Topic:** `archived-orders`
+- **Consumer Topic:** `processed-orders`
 
 ## Setup Instructions
 
@@ -68,10 +72,9 @@ This project consists of two microservices that communicate using Apache Kafka:
    ```
 
 ### Steps to Run Microservices
-1. **Create Kafka Topics**
+1. **Create Kafka Topic**
    ```sh
-   bin/kafka-topics.sh --create --topic order-events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
-   bin/kafka-topics.sh --create --topic archived-orders --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+   bin/kafka-topics.sh --create --topic processed-orders --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
    ```
 2. **Run Order Processing Service**
    ```sh
@@ -85,10 +88,31 @@ This project consists of two microservices that communicate using Apache Kafka:
 ## Testing the Workflow
 1. **Submit an order:**
    ```sh
-   curl -X POST http://localhost:8080/orders/add -H "Content-Type: application/json" -d '{"orderName": "Laptop"}'
+   curl -X POST http://localhost:8080/orders/receive -H "Content-Type: application/json" -d '{"orderName": "Laptop"}'
    ```
-2. **Verify processing in logs**
-3. **Check archived orders in the database**
+2. **Retrieve all unprocessed orders:**
+   ```sh
+   curl -X GET http://localhost:8080/orders/all-unprocessed
+   ```
+3. **Add hardcoded test orders:**
+   ```sh
+   curl -X GET http://localhost:8080/orders/addHardcoded
+   ```
+4. **Check archived orders using API:**
+   ```sh
+   curl -X GET http://localhost:8081/archived-orders/all
+   ```
+5. **Test archiving an order manually:**
+   ```sh
+   curl -X POST http://localhost:8081/archived-orders -H "Content-Type: application/json" -d '{
+     "id": "123",
+     "orderName": "Smartphone"
+   }'
+   ```
+   **Expected Responses:**
+   - `200 OK` - Order archived successfully.
+   - `400 Bad Request` - If order ID is missing.
+   - `500 Internal Server Error` - If saving fails.
 
 ## Future Enhancements
 - Implement retries for failed messages
@@ -96,4 +120,4 @@ This project consists of two microservices that communicate using Apache Kafka:
 - Deploy using Kubernetes
 
 ## Contributors
-- Arun Bhati
+- Arun 
