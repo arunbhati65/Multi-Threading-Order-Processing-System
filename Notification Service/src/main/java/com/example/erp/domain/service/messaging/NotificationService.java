@@ -17,11 +17,11 @@ public class NotificationService {
     public void consumeProcessedOrder(UnprocessedOrder processedOrder) {
         System.out.println("Received Notification Request: " + processedOrder);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo("anandprem199306@gmail.com");
+        mailMessage.setTo("arunbhati65@gmail.com");
         mailMessage.setSubject("Order Status Update");
         mailMessage.setText("Your order with ID " + processedOrder.getId() + " is now " + processedOrder.getStatus() + ".");
         mailSender.send(mailMessage);
 
-        System.out.println("Email sent to " + "anandprem199306@gmail.com");
+        System.out.println("Email sent to " + "arunbhati65@gmail.com");
     }
 }
