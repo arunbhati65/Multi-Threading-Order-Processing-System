@@ -52,24 +52,43 @@ This project consists of two microservices that communicate using Apache Kafka:
 - Maven
 
 ### Installing and Running Kafka
-1. **Download and Extract Kafka**
-   ```sh
-   wget https://downloads.apache.org/kafka/4.0.0/kafka_2.13-4.0.0.tgz
-   tar -xzf kafka_2.13-4.0.0.tgz
-   cd kafka_2.13-4.0.0
-   ```
-2. **Start Zookeeper** (Kafka requires Zookeeper to run)
-   ```sh
-   bin/zookeeper-server-start.sh config/zookeeper.properties &
-   ```
-3. **Start Kafka Broker**
-   ```sh
-   bin/kafka-server-start.sh config/server.properties &
-   ```
-4. **Verify Kafka is Running**
-   ```sh
-   bin/kafka-topics.sh --list --bootstrap-server localhost:9092
-   ```
+
+#### Step 1: Download and Extract Kafka
+```sh
+wget https://downloads.apache.org/kafka/4.0.0/kafka_2.13-4.0.0.tgz
+tar -xzf kafka_2.13-4.0.0.tgz
+cd kafka_2.13-4.0.0
+```
+
+#### Step 2: Start the Kafka Environment
+**NOTE:** Your local environment must have **Java 17+** installed.
+
+Kafka can be run using local scripts and downloaded files or the Docker image.
+
+##### Generate a Cluster UUID  
+```sh  
+KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"  
+```
+
+##### Format Log Directories  
+```sh  
+bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/server.properties  
+```
+
+##### Start Zookeeper (Kafka requires Zookeeper to run)
+```sh
+bin/zookeeper-server-start.sh config/zookeeper.properties &
+```
+
+##### Start Kafka Broker
+```sh
+bin/kafka-server-start.sh config/server.properties &
+```
+
+##### Verify Kafka is Running
+```sh
+bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+```
 
 ### Steps to Run Microservices
 1. **Create Kafka Topic**
@@ -120,4 +139,4 @@ This project consists of two microservices that communicate using Apache Kafka:
 - Deploy using Kubernetes
 
 ## Contributors
-- Arun 
+- Arun
